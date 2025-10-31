@@ -8,11 +8,7 @@ from sqlalchemy.orm import (
     relationship
 )
 
-BASE_DIR = ":memory:"
-engine = create_engine(
-    url=f"sqlite:///",
-    echo=True
-)
+engine = create_engine("sqlite:///:memory:")
 
 Session = sessionmaker(bind=engine)
 session = Session()
