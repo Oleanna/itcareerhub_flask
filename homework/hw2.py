@@ -16,7 +16,7 @@ class User(BaseModel):
     address: Address
 
     @field_validator("is_employed")
-    def check_age(cls, value: int, info: ValidationInfo):
+    def check_age(cls, value: bool, info: ValidationInfo):
         age = info.data.get('age')
         if value and not (18 <= age <= 65):
             raise ValueError('If user is employed, age must be between 18 and 65')
