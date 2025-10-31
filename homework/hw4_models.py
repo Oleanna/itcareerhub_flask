@@ -2,23 +2,15 @@ from pathlib import Path
 from typing import Optional
 from sqlalchemy import String, Integer, create_engine, ForeignKey, Text, Table, Column, Float, Boolean
 from sqlalchemy.orm import (
-    sessionmaker,
     DeclarativeBase,
     Mapped,
     mapped_column,
-    relationship
+    relationship, declarative_base
 )
 
-BASE_DIR: Path = Path(__file__).parent
+from homework.hw4 import engine
 
-DB_PATH: Path = BASE_DIR / 'test_database_hw.db'
-
-engine = create_engine(
-    url=f"sqlite:///{DB_PATH}",
-    echo=True
-)
-Session = sessionmaker(bind=engine)
-session = Session()
+Base = declarative_base()
 
 class Base(DeclarativeBase):
     __abstract__ = True
@@ -52,7 +44,7 @@ class Category(Base):
     name: Mapped[str] = mapped_column(String(100))
     description: Mapped[str] = mapped_column(String(255))
 
-    products: Mapped["Product"] = relationship("Product", back_populates="categories")
+    products: Mapped[list["Product"]] = relationship("Product", back_populates="categories")
 
 
 Base.metadata.create_all(bind=engine)
