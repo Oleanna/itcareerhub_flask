@@ -13,6 +13,10 @@ class Poll(Base, TimestampMixin):
     end_date: Mapped[datetime] = mapped_column(DateTime, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     is_anonymous: Mapped[bool] = mapped_column(Boolean, default=True)
+    category_id: Mapped[int] = mapped_column(
+        ForeignKey('categories.id'),
+        nullable=True
+    )
 
     # Связи
     options: Mapped[list["PollOption"]] = relationship(
@@ -28,6 +32,7 @@ class Poll(Base, TimestampMixin):
         uselist=False,  # One-to-One отношение
         cascade="all, delete-orphan"
     )
+    category: Mapped["Category"] = relationship(back_populates="polls")
 
 
 
