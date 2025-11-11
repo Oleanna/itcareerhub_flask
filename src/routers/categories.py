@@ -76,16 +76,16 @@ def list_of_categories() -> list[dict[str, Any]]:
             "message": str(exc)
         }), 500
 
-@categories_bp.route('/<int:question_id>/delete', methods=["DELETE"])
-def delete_categories(categories_id: int) -> str:
+@categories_bp.route('/<int:category_id>', methods=["DELETE"])
+def delete_categories(category_id: int) -> str:
     try:
-        category = Category.query.get(categories_id)
+        category = Category.query.get(category_id)
 
         if not category:
             return jsonify(
                 {
                     "error": "Not Found",
-                    "message": f"Category with ID {categories_id} was not found"
+                    "message": f"Category with ID {category_id} was not found"
                 }
             ), 404
 
@@ -96,7 +96,7 @@ def delete_categories(categories_id: int) -> str:
         db.session.delete(category)
         db.session.commit()
 
-        message = f"Category with ID {categories_id} was deleted successfully."
+        message = f"Category with ID {category_id} was deleted successfully."
 
         return jsonify({
                 "message": message
