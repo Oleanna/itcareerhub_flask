@@ -71,7 +71,7 @@ class PollResponse(IDMixin, TimestampMixin):
     is_active: bool = True
     is_anonymous: bool = True
     category_id: Optional[int] = None
-    category: List[CategoryResponse] = None
+    category: Optional[CategoryResponse] = None
     options: List[PollOptionResponse] = Field(
         default_factory=list,
     )

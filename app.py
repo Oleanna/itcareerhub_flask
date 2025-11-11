@@ -8,8 +8,5 @@ create_app(app)
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
 
-#  Empty API {}
-
-#  + 1 endpoint -> -> {"/": home_page}

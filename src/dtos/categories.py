@@ -6,19 +6,19 @@ from pydantic import Field, model_validator
 from src.dtos.base import BaseDTO, IDMixin, TimestampMixin
 
 
-class CategoryCreateRequest(BaseDTO):
+
+class CategoryBase(BaseDTO):
     name: str = Field(
         ...,
         min_length=1,
         max_length=255,
     )
 
-class CategoryUpdateRequest(BaseDTO):
-    name: str = Field(
-        None,
-        min_length=1,
-        max_length=255,
-    )
+class CategoryCreateRequest(CategoryBase):
+    ...
+
+class CategoryUpdateRequest(CategoryBase):
+    ...
 
 class CategoryResponse(IDMixin, TimestampMixin):
     name: str

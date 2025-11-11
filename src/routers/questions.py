@@ -3,10 +3,8 @@ from typing import Any
 
 from pydantic import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import joinedload
 
-# from src.dtos.questions import PollCreateRequest, PollResponse
-# from src.dtos.questions import PollOptionCreateRequest
-# from src.models import Poll, PollOption
 from src.core.db import db
 from src.dtos.questions import PollCreateRequest, PollResponse
 from src.models import Poll, PollOption
@@ -19,16 +17,20 @@ questions_bp = Blueprint("questions", __name__, url_prefix='/questions')
 # R
 @questions_bp.route('', methods=["GET"])
 def list_of_questions() -> list[dict[str, Any]]:
-    return [
-        {
-            "id": 1,
-            "title": "На сколько вы в шоке?"
-        },
-        {
-            "id": 2,
-            "title": "Вы точно в порядке?"
-        }
+    try:
+        polls = Poll.query.options(
+            joinedload(Poll.category),
+            joinedload(Poll.options)
+        ).all()
+        return [
+            PollResponse.model_validate(poll).model_dump()
+            for poll in polls
     ]
+    except Exception as exc:
+        return jsonify({
+                "error": "Unexpected Error",
+                "message": str(exc)
+            }), 500
 
 
 # C
@@ -41,11 +43,20 @@ def create_new_question():
             return jsonify(
                 {
                     "error": "Validation Error",
-                    "message": "Сырых даных не обнаружено"
+                    "message": "No raw data found"
                 }
             ), 400  # BAD REQUEST
 
         poll_data = PollCreateRequest.model_validate(raw_data)
+
+        if poll_data.category_id is not None:
+            from src.models import Category
+            category = Category.query.get(poll_data.category_id)
+            if not category:
+                return jsonify({
+                    "error": "Validation Error",
+                    "message": f"Category {poll_data.category_id} not found"
+                }), 400
 
         options_data = poll_data.options
         poll_dict: dict[str, Any] = poll_data.model_dump(exclude={'options'})
@@ -67,9 +78,13 @@ def create_new_question():
 
         db.session.refresh(poll)
 
+        poll_with_relation = Poll.query.options(
+            joinedload(Poll.category),
+            joinedload(Poll.options)
+        ).get(poll.id)
         poll_response: dict[str, Any] = (
             PollResponse
-            .model_validate(poll)
+            .model_validate(poll_with_relation)
             .model_dump()
         )
 

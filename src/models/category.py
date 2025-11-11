@@ -9,4 +9,4 @@ class Category(Base, TimestampMixin):
 
     name: Mapped[str] = mapped_column(String(100), nullable=False)
 
-    polls: Mapped["Poll"] = relationship(back_populates="category")
+    polls: Mapped[list["Poll"]] = relationship(back_populates="category")
